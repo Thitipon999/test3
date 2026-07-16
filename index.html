@@ -10,11 +10,11 @@
             theme: {
                 extend: {
                     colors: {
-                        brandBlue: '#a5f3fc', // ฟ้าพาสเทล
-                        brandPink: '#fbcfe8', // ชมพูสดใส
-                        brandYellow: '#fef08a', // เหลืองสว่าง
-                        brandMint: '#ccfbf1', // เขียวมิ้นต์
-                        brandPurple: '#e9d5ff' // ม่วงอ่อน
+                        brandBlue: '#a5f3fc',
+                        brandPink: '#fbcfe8',
+                        brandYellow: '#fef08a',
+                        brandMint: '#ccfbf1',
+                        brandPurple: '#e9d5ff'
                     }
                 }
             }
@@ -37,19 +37,16 @@
         .header-font {
             font-family: 'Chakra Petch', sans-serif;
         }
-        /* Glassmorphism Effect */
         .glass {
             background: rgba(255, 255, 255, 0.07);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.15);
         }
-        /* Game Screen Setup to prevent scrolling */
         .game-container {
             height: 100vh;
             max-height: 100vh;
         }
-        /* Hide scrollbars but keep functionality */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -60,18 +57,15 @@
             background: rgba(255,255,255,0.2);
             border-radius: 4px;
         }
-        /* Keypress effect */
         .key-active {
             filter: brightness(1.3);
             transform: scale(0.95);
             box-shadow: 0 0 15px rgba(165, 243, 252, 0.8);
         }
-        /* Note Falling animation target */
         @keyframes fall {
             0% { top: -40px; }
             100% { top: 100%; }
         }
-        /* Print Styles for Certificate */
         @media print {
             body * {
                 visibility: hidden;
@@ -137,7 +131,7 @@
             <div class="text-center mb-6">
                 <div class="text-4xl text-brandBlue mb-2"><i class="fa-solid fa-star animate-spin-slow"></i></div>
                 <h2 class="text-2xl font-bold header-font">ยินดีต้อนรับสู่ Rhythm World!</h2>
-                <p class="text-sm text-slate-400 mt-1">กรุณาเข้าสู่ระบบหรือลงทะเบียนเพื่อบันทึกประวัติการเรียนรู้</p>
+                <p class="text-sm text-slate-400 mt-1">กรุณาเข้าสู่ระบบหรือลงทะเบียนเพื่อบันทัยประวัติการเรียนรู้</p>
             </div>
 
             <div class="flex bg-slate-900/50 p-1 rounded-xl mb-6">
@@ -230,8 +224,7 @@
             </div>
 
             <div id="lobby-lesson-map" class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-4" id="map-levels-grid">
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4" id="map-levels-grid"></div>
 
                 <div id="cert-unlocked-banner" class="hidden glass p-4 rounded-xl border border-brandYellow/30 bg-gradient-to-r from-yellow-500/10 to-indigo-500/10 flex flex-col md:flex-row items-center justify-between gap-4">
                     <div class="flex items-center gap-3">
@@ -254,16 +247,14 @@
                         <p class="text-xs text-slate-400">เล่นเพื่อแข่งขันเก็บคะแนนขึ้น Leaderboard อันดับต้นๆ ของชั้นเรียน!</p>
                     </div>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="freeplay-list-grid">
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="freeplay-list-grid"></div>
             </div>
         </section>
 
         <section id="screen-game" class="w-full max-w-2xl glass rounded-2xl overflow-hidden hidden transition-all duration-300 relative">
             <div class="p-4 border-b border-white/10 flex justify-between items-center bg-slate-950/80">
                 <div class="flex flex-col">
-                    <span id="game-stage-title" class="font-bold text-sm text-brandBlue">ด่าน 1 - มาเริ่มต้นกันเถอะ!</span>
+                    <span id="game-stage-title" class="font-bold text-sm text-brandBlue">ด่าน 1</span>
                     <span id="game-stage-desc" class="text-xs text-slate-400">แนวคิดพื้นฐาน: 4 จังหวะสม่ำเสมอ</span>
                 </div>
                 <div class="flex items-center gap-4">
@@ -335,7 +326,7 @@
                 <i class="fa-solid fa-trophy"></i>
             </div>
             <h2 class="text-2xl font-bold header-font">ยินดีด้วยที่ผ่านด่าน!</h2>
-            <p id="result-stage-title" class="text-sm text-brandPink">ด่านที่ 1 - มาเริ่มต้นกันเถอะ!</p>
+            <p id="result-stage-title" class="text-sm text-brandPink">ด่านที่ 1</p>
 
             <hr class="border-white/10 my-4">
 
@@ -352,19 +343,19 @@
 
             <div class="space-y-2 text-left mb-6 text-sm">
                 <div class="flex justify-between border-b border-white/5 py-1">
-                    <span class="text-brandBlue font-bold">PERFECT (เยี่ยมยอด)</span>
+                    <span class="text-brandBlue font-bold">PERFECT</span>
                     <span id="result-perfect" class="font-mono">0</span>
                 </div>
                 <div class="flex justify-between border-b border-white/5 py-1">
-                    <span class="text-brandMint font-bold">GOOD (ดี)</span>
+                    <span class="text-brandMint font-bold">GOOD</span>
                     <span id="result-good" class="font-mono">0</span>
                 </div>
                 <div class="flex justify-between border-b border-white/5 py-1">
-                    <span class="text-amber-400 font-bold">BAD (เกือบดี)</span>
+                    <span class="text-amber-400 font-bold">BAD</span>
                     <span id="result-bad" class="font-mono">0</span>
                 </div>
                 <div class="flex justify-between py-1">
-                    <span class="text-rose-500 font-bold">MISS (พลาด)</span>
+                    <span class="text-rose-500 font-bold">MISS</span>
                     <span id="result-miss" class="font-mono">0</span>
                 </div>
             </div>
@@ -464,10 +455,10 @@
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">ระดับความยาก</label>
                             <select id="edit-song-diff" class="w-full bg-slate-900/80 border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white">
-                                <option value="Easy">Easy (Lv.10)</option>
-                                <option value="Normal" selected>Normal (Lv.15)</option>
-                                <option value="Hard">Hard (Lv.25)</option>
-                                <option value="Extreme">Extreme (Lv.32)</option>
+                                <option value="Easy">Easy</option>
+                                <option value="Normal" selected>Normal</option>
+                                <option value="Hard">Hard</option>
+                                <option value="Extreme">Extreme</option>
                             </select>
                         </div>
                         <div>
@@ -579,7 +570,6 @@
     </main>
 
     <script>
-        // 1. GAME CONSTANTS & DATABASE STATE
         let currentUser = null;
         let usersDb = JSON.parse(localStorage.getItem('rw_users')) || {};
         let scoresDb = JSON.parse(localStorage.getItem('rw_scores')) || [];
@@ -587,13 +577,11 @@
         let keyMapping = JSON.parse(localStorage.getItem('rw_keys')) || { 0: 'D', 1: 'F', 2: 'J', 3: 'K' };
         let speedMultiplier = parseInt(localStorage.getItem('rw_speed')) || 3;
 
-        // Custom Sound synthesis framework
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let currentCustomAudio = null; // เก็บ Instance ลำโพงเพลง .mp3 คิวปัจจุบัน
-        let mp3Base64Storage = ""; // ตัวแปรพักข้อมูลไฟล์เพลงชั่วคราวขณะอัปโหลด
+        let currentCustomAudio = null;
+        let mp3Base64Storage = "";
 
         function playSynthTone(freq, duration, type = 'sine') {
-            // ไม่ส่งเสียง Synth รบกวนหากด่านนั้นเปิดเล่นผ่านไฟล์เพลง .mp3 อยู่
             if (currentCustomAudio) return; 
             try {
                 const osc = audioCtx.createOscillator();
@@ -775,13 +763,12 @@
             dynamicFreePlayList.forEach(item => {
                 const card = document.createElement('div');
                 card.className = "glass rounded-xl p-4 flex justify-between items-center border border-white/10";
-                card.innerHTML = `<div><span class="text-[10px] bg-indigo-950 text-brandPink px-2 py-0.5 rounded-full font-bold">${item.difficulty}</span><h4 class="font-bold text-sm text-white">${item.title}</h4></div><button class="bg-brandPink text-slate-950 font-bold text-xs px-4 py-2 rounded-xl btn-play-free">เล่น</button>`;
+                card.innerHTML = `<div><span class="text-[10px] bg-indigo-950 text-brandPink px-2 py-0.5 rounded-full font-bold">${item.difficulty} (Lv.${item.lvl})</span><h4 class="font-bold text-sm text-white">${item.title}</h4></div><button class="bg-brandPink text-slate-950 font-bold text-xs px-4 py-2 rounded-xl btn-play-free">เล่น</button>`;
                 card.querySelector('.btn-play-free').addEventListener('click', () => { startRhythmEngine(item, false); });
                 grid.appendChild(card);
             });
         }
 
-        // 6. RHYTHM ENGINE (รองรับการเปิดเพลงประกอบ .mp3)
         let activeStageConfig = null;
         let activeIsCampaign = true;
         let gameLoopId = null;
@@ -797,7 +784,6 @@
             gameScore = 0; gameCombo = 0;
             hitPerfect = 0; hitGood = 0; hitBad = 0; hitMiss = 0; gameNotes = [];
             
-            // ล้างเสียงเพลงเก่าที่ค้างอยู่ก่อนหน้าออกทั้งหมด
             if (currentCustomAudio) { currentCustomAudio.pause(); currentCustomAudio = null; }
 
             showScreen('screen-game');
@@ -808,10 +794,9 @@
             const notesContainer = document.getElementById('notes-container');
             Array.from(notesContainer.children).forEach(c => { if (c.id !== 'judgment-float') c.remove(); });
 
-            // ตรวจสอบว่าด่านมีไฟล์เพลง .mp3 ประกอบอยู่หรือไม่
             if (stageConfig.audioData && stageConfig.audioData !== "") {
                 currentCustomAudio = new Audio(stageConfig.audioData);
-                currentCustomAudio.play().catch(e => console.log("Audio presentation gesture error handled."));
+                currentCustomAudio.play().catch(e => console.log("Audio load catch."));
                 speakAssistant(`กำลังเล่นฟิลด์เสียงเพลงอัปโหลดจริง ความเร็วตัวโน้ตคูณ ${speedMultiplier}`);
             } else {
                 speakAssistant("เล่นเสียงสังเคราะห์แจ้งจังหวะพื้นฐาน");
@@ -823,7 +808,6 @@
             
             stageConfig.beats.forEach((beat, index) => {
                 const lane = Math.floor(Math.random() * 4);
-                // ตั้งค่าหน่วงเวลาโน้ต 1.5 วินาทีเพื่อให้เริ่มพอดีหน้าจอ
                 const targetTime = (beat * beatIntervalMs) + 1500;
                 gameNotes.push({ id: `note-${index}`, lane: lane, targetTime: targetTime, hit: false, domElement: null });
             });
@@ -833,7 +817,6 @@
 
             activeAudioInterval = setInterval(() => {
                 synthTicks++;
-                // สลับจังหวะส่งเสียงเคาะกลองเฉพาะด่านสไตล์ทดสอบที่ไม่มีไฟล์เพลงสด
                 if (!currentCustomAudio) {
                     if (synthTicks % 4 === 0) playSynthTone(150, 0.15, 'triangle');
                     else playSynthTone(600, 0.05, 'sine');
@@ -964,25 +947,21 @@
             myClassChart = new Chart(ctx, { type: 'bar', data: { labels: ['ม.1','ม.2','ม.3'], datasets:[{label:'คะแนนรวม', data:[1200,850,0], backgroundColor:'#a5f3fc'}] }, options:{responsive:true, maintainAspectRatio:false}});
         }
 
-        // 8. DYNAMIC CHART EDITOR (รองรับการแปลงไฟล์เพลง .mp3 เป็น Base64 String)
         function updateChartEditor() {
             const mp3FileInput = document.getElementById('edit-song-mp3-file');
             
-            // ตรวจสอบการอัปโหลดและจับไฟล์เสียง .mp3 แปลงสถานะ
             mp3FileInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
 
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    // เก็บข้อมูลไฟล์เพลงในรูปแบบ Base64 ลงตัวแปร เพื่อนำไปเซฟคู่กับ Chart
                     mp3Base64Storage = event.target.result;
-                    console.log("ขอดึงและจดจำโครงสร้างไฟล์เพลงสำเร็จ!");
+                    console.log("Audio track loaded completely.");
                 };
-                reader.readAsDataURL(file); // อ่านข้อมูลแบบ DataURL สำหรับใช้รัน Audio สด
+                reader.readAsDataURL(file);
             });
 
-            // ตรวจสอบไฟล์ดึงโน้ตจากสากล .osu
             const osuFileInput = document.getElementById('edit-song-osu-file');
             osuFileInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
@@ -1003,7 +982,6 @@
 
                 let finalBeats = tempParsedOsuBeats;
                 if (finalBeats.length === 0) {
-                    // หากไม่ได้นำเข้าไฟล์โน้ต .osu จะทำการสุ่มจำลองบีตจังหวะความยาว 30 วินาทีให้
                     for (let i = 2; i <= 36; i += 2) finalBeats.push(i);
                 }
 
@@ -1015,15 +993,14 @@
                     lvl: level,
                     difficulty: diffLabel,
                     beats: finalBeats,
-                    audioData: mp3Base64Storage // ทำการผูกข้อมูลเสียง .mp3 ฝังเข้าตัวแปรด่าน
+                    audioData: mp3Base64Storage
                 };
 
                 dynamicFreePlayList.push(newChart);
                 localStorage.setItem('rw_freeplay_charts', JSON.stringify(dynamicFreePlayList));
                 
-                alert(`บันทึกชาร์ตเพลงและโอนถ่ายไฟล์เสียง "${title}" เรียบร้อยแล้ว!`);
+                alert(`บันทึกชาร์ตเพลง "${title}" เรียบร้อยแล้ว!`);
                 
-                // รีเซ็ตตัวแปรเก็บไฟล์เสียงชั่วคราวหลังทำรายการเสร็จสิ้น
                 mp3Base64Storage = "";
                 tempParsedOsuBeats = [];
                 document.getElementById('edit-song-mp3-file').value = "";
