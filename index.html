@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rhythm World - โลกแห่งจังหวะเพลงและดนตรี</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandBlue: '#a5f3fc', // ฟ้าพาสเทล
+                        brandPink: '#fbcfe8', // ชมพูสดใส
+                        brandYellow: '#fef08a', // เหลืองสว่าง
+                        brandMint: '#ccfbf1', // เขียวมิ้นต์
+                        brandPurple: '#e9d5ff' // ม่วงอ่อน
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Mitr:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Mitr', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f8fafc;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .header-font {
+            font-family: 'Chakra Petch', sans-serif;
+        }
+        /* Glassmorphism Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        /* Game Screen Setup to prevent scrolling */
+        .game-container {
+            height: 100vh;
+            max-height: 100vh;
+        }
+        /* Hide scrollbars but keep functionality */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+        }
+        /* Keypress effect */
+        .key-active {
+            filter: brightness(1.3);
+            transform: scale(0.95);
+            box-shadow: 0 0 15px rgba(165, 243, 252, 0.8);
+        }
+        /* Note Falling animation target */
+        @keyframes fall {
+            0% { top: -40px; }
+            100% { top: 100%; }
+        }
+        /* Print Styles for Certificate */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background: white !important;
+                color: black !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                align-items: center !important;
+                border: 10px double #1e1b4b !important;
+                padding: 40px !important;
+                box-sizing: border-box !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="relative min-h-screen">
+
+    <header class="fixed top-0 left-0 w-full h-16 z-50 glass flex items-center justify-between px-6">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brandBlue to-brandPink flex items-center justify-center text-slate-900 font-bold text-xl shadow-lg">
+                <i class="fa-solid fa-music text-sm animate-bounce"></i>
+            </div>
+            <div>
+                <h1 class="header-font font-bold text-lg text-brandBlue tracking-wide leading-none">Rhythm World</h1>
+                <p class="text-xs text-brandPink font-light">โลกแห่งจังหวะเพลงและดนตรี</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <div id="nav-user-info" class="hidden text-xs text-right md:block">
+                <span id="nav-username" class="font-semibold text-brandYellow">ผู้เล่นใหม่</span>
+                <p id="nav-class-no" class="text-slate-400">ระดับชั้น</p>
+            </div>
+            <button id="btn-settings" class="w-10 h-10 rounded-lg glass flex items-center justify-center hover:bg-white/20 transition" title="ตั้งค่า">
+                <i class="fa-solid fa-cog text-slate-200"></i>
+            </button>
+            <button id="btn-teacher-portal" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition shadow-lg shadow-indigo-900/30">
+                <i class="fa-solid fa-chalkboard-user"></i> <span class="hidden sm:inline">สำหรับคุณครู</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="pt-20 px-4 pb-6 min-h-screen flex flex-col justify-center items-center">
+        
+        <section id="screen-auth" class="w-full max-w-md glass rounded-2xl p-6 shadow-2xl relative overflow-hidden transition-all duration-300">
+            <div class="absolute -top-12 -right-12 w-32 h-32 bg-brandPink/20 rounded-full blur-2xl"></div>
+            <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-brandBlue/20 rounded-full blur-2xl"></div>
+            
+            <div class="text-center mb-6">
+                <div class="text-4xl text-brandBlue mb-2"><i class="fa-solid fa-star animate-spin-slow"></i></div>
+                <h2 class="text-2xl font-bold header-font">ยินดีต้อนรับสู่ Rhythm World!</h2>
+                <p class="text-sm text-slate-400 mt-1">กรุณาเข้าสู่ระบบหรือลงทะเบียนเพื่อบันทึกประวัติการเรียนรู้</p>
+            </div>
+
+            <div class="flex bg-slate-900/50 p-1 rounded-xl mb-6">
+                <button id="tab-login" type="button" class="flex-1 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white transition duration-200">เข้าสู่ระบบ</button>
+                <button id="tab-register" type="button" class="flex-1 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white transition duration-200">ลงทะเบียนใหม่</button>
+            </div>
+
+            <form id="form-login" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1">ชื่อผู้ใช้งาน</label>
+                    <input type="text" id="login-username" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-sm" placeholder="กรอกชื่อผู้เล่น">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1">รหัสผ่าน</label>
+                    <input type="password" id="login-password" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-sm" placeholder="กรอกรหัสผ่าน">
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-indigo-600 hover:opacity-90 rounded-lg font-bold text-sm shadow-lg transition">
+                    เข้าสู่โลกดนตรี <i class="fa-solid fa-right-to-bracket ml-1"></i>
+                </button>
+            </form>
+
+            <form id="form-register" class="space-y-4 hidden">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">ชื่อผู้ใช้งาน</label>
+                        <input type="text" id="reg-username" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-sm" placeholder="ภาษาอังกฤษ/ไทย">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">รหัสผ่าน</label>
+                        <input type="password" id="reg-password" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-sm" placeholder="อย่างน้อย 4 ตัว">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">ระดับชั้นเรียน</label>
+                        <select id="reg-grade" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500 text-sm">
+                            <option value="ป.1">ประถมศึกษาปีที่ 1</option>
+                            <option value="ป.2">ประถมศึกษาปีที่ 2</option>
+                            <option value="ป.3">ประถมศึกษาปีที่ 3</option>
+                            <option value="ป.4">ประถมศึกษาปีที่ 4</option>
+                            <option value="ป.5">ประถมศึกษาปีที่ 5</option>
+                            <option value="ป.6">ประถมศึกษาปีที่ 6</option>
+                            <option value="ม.1">มัธยมศึกษาปีที่ 1</option>
+                            <option value="ม.2">มัธยมศึกษาปีที่ 2</option>
+                            <option value="ม.3">มัธยมศึกษาปีที่ 3</option>
+                            <option value="ม.4">มัธยมศึกษาปีที่ 4</option>
+                            <option value="ม.5">มัธยมศึกษาปีที่ 5</option>
+                            <option value="ม.6">มัธยมศึกษาปีที่ 6</option>
+                            <option value="อื่นๆ">บุคคลทั่วไป / เกมเมอร์</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-300 mb-1">เลขที่</label>
+                        <input type="number" id="reg-no" min="1" max="100" required class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-sm" placeholder="เช่น 15">
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-pink-500 to-rose-600 hover:opacity-90 rounded-lg font-bold text-sm shadow-lg transition">
+                    สร้างบัญชีและเข้าสู่ระบบ <i class="fa-solid fa-user-plus ml-1"></i>
+                </button>
+            </form>
+        </section>
+
+        <section id="screen-lobby" class="w-full max-w-5xl space-y-8 hidden transition-all duration-300">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900/40 p-6 rounded-2xl border border-slate-800">
+                <div>
+                    <h2 class="text-3xl font-bold header-font text-transparent bg-clip-text bg-gradient-to-r from-brandBlue via-brandPink to-brandYellow">
+                        ยินดีต้อนรับกลับมา, <span id="lobby-player-name">ผู้เล่น</span>!
+                    </h2>
+                    <p class="text-sm text-slate-300 mt-1">มาปลดปล่อยจังหวะและเรียนรู้ความรู้ดนตรีระดับสากลกันเลย</p>
+                </div>
+                <div class="flex gap-4">
+                    <div class="glass px-4 py-2 rounded-xl text-center">
+                        <span class="text-xs text-slate-400 block">ด่านที่ผ่าน</span>
+                        <span id="lobby-progress" class="text-lg font-bold text-brandMint">0 / 5</span>
+                    </div>
+                    <div class="glass px-4 py-2 rounded-xl text-center">
+                        <span class="text-xs text-slate-400 block">คะแนนรวมสะสม</span>
+                        <span id="lobby-total-score" class="text-lg font-bold text-brandYellow">0 PTS</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex border-b border-slate-700">
+                <button id="lobby-tab-map" class="py-3 px-6 text-sm font-bold border-b-2 border-brandBlue text-brandBlue flex items-center gap-2">
+                    <i class="fa-solid fa-map-marked-alt"></i> แผนที่การเรียนรู้ (Lesson Map)
+                </button>
+                <button id="lobby-tab-free" class="py-3 px-6 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 transition">
+                    <i class="fa-solid fa-compact-disc animate-spin-slow"></i> อิสระ (Free Play)
+                </button>
+            </div>
+
+            <div id="lobby-lesson-map" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4" id="map-levels-grid">
+                    </div>
+
+                <div id="cert-unlocked-banner" class="hidden glass p-4 rounded-xl border border-brandYellow/30 bg-gradient-to-r from-yellow-500/10 to-indigo-500/10 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-award text-4xl text-brandYellow animate-pulse"></i>
+                        <div>
+                            <h4 class="font-bold text-lg text-brandYellow">ยินดีด้วย! คุณเคลียร์เนื้อหาครบเรียบร้อยแล้ว</h4>
+                            <p class="text-xs text-slate-400">คุณสามารถเปิดดูและบันทึกเกียรติบัตรเพื่อยืนยันความสำเร็จของคุณได้ทันที!</p>
+                        </div>
+                    </div>
+                    <button id="btn-show-certificate" class="bg-brandYellow hover:bg-yellow-400 text-slate-900 px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition shadow-lg">
+                        <i class="fa-solid fa-file-invoice"></i> รับเกียรติบัตรรางวัล
+                    </button>
+                </div>
+            </div>
+
+            <div id="lobby-free-play" class="space-y-6 hidden">
+                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 flex items-center justify-between flex-wrap gap-3">
+                    <div>
+                        <h3 class="font-bold text-lg text-brandPink">ตู้เพลงเสรี (Free Play Charts)</h3>
+                        <p class="text-xs text-slate-400">เล่นเพื่อแข่งขันเก็บคะแนนขึ้น Leaderboard อันดับต้นๆ ของชั้นเรียน!</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="freeplay-list-grid">
+                    </div>
+            </div>
+        </section>
+
+        <section id="screen-game" class="w-full max-w-2xl glass rounded-2xl overflow-hidden hidden transition-all duration-300 relative">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center bg-slate-950/80">
+                <div class="flex flex-col">
+                    <span id="game-stage-title" class="font-bold text-sm text-brandBlue">ด่าน 1 - มาเริ่มต้นกันเถอะ!</span>
+                    <span id="game-stage-desc" class="text-xs text-slate-400">แนวคิดพื้นฐาน: 4 จังหวะสม่ำเสมอ</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-right">
+                        <span class="text-xs text-slate-400 block">BPM</span>
+                        <span id="game-bpm" class="font-bold text-brandYellow text-sm">120</span>
+                    </div>
+                    <button id="btn-abort-game" class="text-xs bg-rose-600/80 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg font-semibold transition">
+                        <i class="fa-solid fa-right-from-bracket"></i> ยอมแพ้
+                    </button>
+                </div>
+            </div>
+
+            <div id="speech-assistant" class="bg-indigo-950/50 px-4 py-2 text-xs text-brandBlue flex items-center gap-2 border-b border-white/5">
+                <i class="fa-solid fa-volume-high animate-pulse"></i>
+                <span id="speech-text">ระบบสอนเสียงสังเคราะห์กำลังโหลด...</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-1 p-3 bg-slate-900/40 text-center border-b border-white/5">
+                <div class="glass rounded-lg py-1">
+                    <span class="text-[10px] text-slate-400 block">SCORE</span>
+                    <span id="live-score" class="text-xl font-bold header-font text-white">00000</span>
+                </div>
+                <div class="glass rounded-lg py-1">
+                    <span class="text-[10px] text-slate-400 block">COMBO</span>
+                    <span id="live-combo" class="text-xl font-bold header-font text-brandPink">0</span>
+                </div>
+            </div>
+
+            <div class="relative w-full bg-slate-950 h-[450px] overflow-hidden flex flex-col justify-end">
+                <div class="absolute inset-0 flex">
+                    <div class="flex-1 border-r border-white/5 relative bg-gradient-to-b from-transparent to-indigo-950/20" id="lane-0"></div>
+                    <div class="flex-1 border-r border-white/5 relative bg-gradient-to-b from-transparent to-indigo-950/20" id="lane-1"></div>
+                    <div class="flex-1 border-r border-white/5 relative bg-gradient-to-b from-transparent to-indigo-950/20" id="lane-2"></div>
+                    <div class="flex-1 relative bg-gradient-to-b from-transparent to-indigo-950/20" id="lane-3"></div>
+                </div>
+
+                <div class="absolute inset-0" id="notes-container" style="pointer-events: none;">
+                    <div id="judgment-float" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center select-none pointer-events-none transition duration-150 scale-0">
+                        <span id="judgment-text" class="text-3xl font-extrabold tracking-widest block drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">PERFECT</span>
+                    </div>
+                </div>
+
+                <div class="w-full h-1 bg-brandBlue absolute bottom-24 shadow-[0_0_8px_#a5f3fc] z-10 pointer-events-none"></div>
+
+                <div class="w-full h-24 bg-slate-900/90 z-20 flex px-1 pb-3 pt-1 border-t border-white/10">
+                    <button class="flex-1 mx-1 rounded-xl glass flex flex-col justify-center items-center key-pad transition select-none active:scale-95" data-lane="0">
+                        <span class="text-xs text-slate-400 font-bold block mb-1">Lane 1</span>
+                        <kbd id="keybind-display-0" class="px-2 py-0.5 bg-slate-800 text-white text-xs rounded border border-slate-600 font-mono">D</kbd>
+                    </button>
+                    <button class="flex-1 mx-1 rounded-xl glass flex flex-col justify-center items-center key-pad transition select-none active:scale-95" data-lane="1">
+                        <span class="text-xs text-slate-400 font-bold block mb-1">Lane 2</span>
+                        <kbd id="keybind-display-1" class="px-2 py-0.5 bg-slate-800 text-white text-xs rounded border border-slate-600 font-mono">F</kbd>
+                    </button>
+                    <button class="flex-1 mx-1 rounded-xl glass flex flex-col justify-center items-center key-pad transition select-none active:scale-95" data-lane="2">
+                        <span class="text-xs text-slate-400 font-bold block mb-1">Lane 3</span>
+                        <kbd id="keybind-display-2" class="px-2 py-0.5 bg-slate-800 text-white text-xs rounded border border-slate-600 font-mono">J</kbd>
+                    </button>
+                    <button class="flex-1 mx-1 rounded-xl glass flex flex-col justify-center items-center key-pad transition select-none active:scale-95" data-lane="3">
+                        <span class="text-xs text-slate-400 font-bold block mb-1">Lane 4</span>
+                        <kbd id="keybind-display-3" class="px-2 py-0.5 bg-slate-800 text-white text-xs rounded border border-slate-600 font-mono">K</kbd>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="screen-result" class="w-full max-w-md glass rounded-2xl p-6 shadow-2xl text-center hidden transition-all duration-300">
+            <div class="w-16 h-16 rounded-full bg-brandMint/10 border border-brandMint text-brandMint flex items-center justify-center text-3xl mx-auto mb-4 animate-bounce">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+            <h2 class="text-2xl font-bold header-font">ยินดีด้วยที่ผ่านด่าน!</h2>
+            <p id="result-stage-title" class="text-sm text-brandPink">ด่านที่ 1 - มาเริ่มต้นกันเถอะ!</p>
+
+            <hr class="border-white/10 my-4">
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div class="bg-slate-900/60 p-3 rounded-lg">
+                    <span class="text-xs text-slate-400 block">คะแนนทั้งหมด</span>
+                    <span id="result-score" class="text-2xl font-bold text-white">0</span>
+                </div>
+                <div class="bg-slate-900/60 p-3 rounded-lg">
+                    <span class="text-xs text-slate-400 block">คอมโบสูงสุด</span>
+                    <span id="result-combo" class="text-2xl font-bold text-brandYellow">0</span>
+                </div>
+            </div>
+
+            <div class="space-y-2 text-left mb-6 text-sm">
+                <div class="flex justify-between border-b border-white/5 py-1">
+                    <span class="text-brandBlue font-bold">PERFECT (เยี่ยมยอด)</span>
+                    <span id="result-perfect" class="font-mono">0</span>
+                </div>
+                <div class="flex justify-between border-b border-white/5 py-1">
+                    <span class="text-brandMint font-bold">GOOD (ดี)</span>
+                    <span id="result-good" class="font-mono">0</span>
+                </div>
+                <div class="flex justify-between border-b border-white/5 py-1">
+                    <span class="text-amber-400 font-bold">BAD (เกือบดี)</span>
+                    <span id="result-bad" class="font-mono">0</span>
+                </div>
+                <div class="flex justify-between py-1">
+                    <span class="text-rose-500 font-bold">MISS (พลาด)</span>
+                    <span id="result-miss" class="font-mono">0</span>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button id="btn-result-lobby" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold text-sm transition">
+                    <i class="fa-solid fa-house mr-1"></i> เมนูหลัก
+                </button>
+                <button id="btn-result-retry" class="flex-1 py-2.5 bg-gradient-to-r from-brandBlue to-indigo-600 hover:opacity-90 text-slate-950 rounded-xl font-bold text-sm transition">
+                    <i class="fa-solid fa-rotate-right mr-1"></i> เล่นอีกครั้ง
+                </button>
+            </div>
+        </section>
+
+        <section id="screen-teacher" class="w-full max-w-5xl glass rounded-2xl p-6 hidden transition-all duration-300">
+            <div class="flex justify-between items-center pb-4 mb-6 border-b border-white/10">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-user-tie text-2xl text-brandBlue"></i>
+                    <div>
+                        <h2 class="text-xl font-bold header-font">ระบบการจัดการเรียนรู้ของคุณครู (Teacher Dashboard)</h2>
+                        <p class="text-xs text-slate-400">ควบคุม ตรวจสอบประเมินผลสัมฤทธิ์ของนักเรียน และแก้ไข Chart เพลง</p>
+                    </div>
+                </div>
+                <button id="btn-exit-teacher" class="bg-rose-600 hover:bg-rose-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition">
+                    <i class="fa-solid fa-xmark mr-1"></i> ออกจากห้องครู
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                <div class="bg-indigo-950/40 p-4 rounded-xl border border-indigo-800/30">
+                    <span class="text-slate-400 text-xs block">นักเรียนลงทะเบียนสะสม</span>
+                    <span id="dash-students-count" class="text-3xl font-extrabold text-white">0</span>
+                </div>
+                <div class="bg-cyan-950/40 p-4 rounded-xl border border-cyan-800/30">
+                    <span class="text-slate-400 text-xs block">คะแนนท็อปสกอร์ของห้อง</span>
+                    <span id="dash-top-score" class="text-3xl font-extrabold text-brandBlue">0 PTS</span>
+                </div>
+                <div class="bg-pink-950/40 p-4 rounded-xl border border-pink-800/30">
+                    <span class="text-slate-400 text-xs block">การเล่นสะสมรวมทั้งหมด</span>
+                    <span id="dash-total-plays" class="text-3xl font-extrabold text-brandPink">0 ครั้ง</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <div class="lg:col-span-2 bg-slate-950/60 p-4 rounded-xl border border-slate-800 h-80 flex flex-col">
+                    <span class="font-bold text-sm text-slate-300 mb-2">เปรียบเทียบคะแนนเฉลี่ยสูงสุดในแต่ละชั้นเรียน</span>
+                    <div class="flex-1 relative">
+                        <canvas id="scoresChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-4 flex flex-col justify-between">
+                    <div>
+                        <h4 class="font-bold text-sm text-brandPink mb-1">การจัดการฐานข้อมูลห้องเรียน</h4>
+                        <p class="text-xs text-slate-400">คุณสามารถตรวจสอบรายชื่อนักเรียนและรีเซ็ตคะแนนกรณีเริ่มวิชาเรียนใหม่ได้ที่นี่</p>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="h-32 overflow-y-auto border border-slate-800 rounded bg-slate-900/50 p-2 text-xs text-slate-300" id="student-list">
+                            ไม่มีรายชื่อข้อมูลนักเรียนในระบบขณะนี้
+                        </div>
+                        <button id="btn-reset-db" class="w-full py-2 bg-rose-700/80 hover:bg-rose-700 text-white rounded-lg text-xs font-bold transition">
+                            <i class="fa-solid fa-trash-can mr-1"></i> ล้างคะแนนสถิติเด็กทั้งห้อง
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-950/60 p-5 rounded-xl border border-slate-800 space-y-4">
+                <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                    <h3 class="font-bold text-brandYellow text-md flex items-center gap-2">
+                        <i class="fa-solid fa-sliders"></i> ออกแบบ / เพิ่ม Chart เพลงในระบบ Dynamic Free Play
+                    </h3>
+                    <span class="text-xs text-slate-400">รองรับไฟล์เสียงเพลงประกอบสากล</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">ชื่อเพลง (Song Title)</label>
+                            <input type="text" id="edit-song-title" value="New Dynamic Beat" class="w-full bg-slate-900/80 border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">ศิลปิน (Artist)</label>
+                            <input type="text" id="edit-song-artist" value="Music Creator" class="w-full bg-slate-900/80 border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">BPM</label>
+                                <input type="number" id="edit-song-bpm" value="120" class="w-full bg-slate-900/80 border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">ความยาก (Difficulty Level)</label>
+                                <input type="number" id="edit-song-lvl" value="12" class="w-full bg-slate-900/80 border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">ระดับความยาก</label>
+                            <select id="edit-song-diff" class="w-full bg-slate-900/80 border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white">
+                                <option value="Easy">Easy (Lv.10)</option>
+                                <option value="Normal" selected>Normal (Lv.15)</option>
+                                <option value="Hard">Hard (Lv.25)</option>
+                                <option value="Extreme">Extreme (Lv.32)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-brandPink font-semibold mb-1"><i class="fa-solid fa-file-audio mr-1"></i> ไฟล์เพลงประกอบ (.mp3)</label>
+                            <input type="file" id="edit-song-mp3-file" accept="audio/mp3, audio/mpeg" class="w-full bg-slate-900 border border-pink-700/50 rounded px-2 py-1 text-xs text-slate-300 focus:outline-none focus:border-brandPink">
+                            <span class="text-[10px] text-slate-500 block mt-1">ไฟล์เสียงจะเล่นสดขณะผู้เรียนเข้าทดสอบจังหวะ</span>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">หรือนำเข้าไฟล์ .osu (osu!mania 4K)</label>
+                            <input type="file" id="edit-song-osu-file" accept=".osu" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-slate-300">
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col justify-end space-y-2">
+                        <button id="btn-save-chart" class="w-full py-2 bg-brandBlue hover:opacity-95 text-slate-950 font-bold text-xs rounded-lg transition">
+                            <i class="fa-solid fa-check mr-1"></i> อัปโหลดและบันทึกสู่ตู้เพลง Free Play
+                        </button>
+                        <p class="text-[10px] text-slate-400 text-center leading-relaxed">
+                            ระบบจะแปลงไฟล์ .mp3 เป็น Base64 และบันทึกลงหน่วยความจำภายในเครื่องโดยอัตโนมัติ
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="panel-settings" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 hidden">
+            <div class="glass w-full max-w-sm rounded-2xl p-6 relative">
+                <button id="btn-close-settings" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <h3 class="text-xl font-bold header-font mb-4 text-brandBlue flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> ตั้งค่าการควบคุมและเกม
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <span class="block text-xs text-slate-400 mb-2">กำหนดปุ่มเล่น 4 เลน (Key Bindings)</span>
+                        <div class="grid grid-cols-4 gap-2">
+                            <div>
+                                <span class="text-[10px] text-slate-500 block text-center mb-1">เลน 1</span>
+                                <input type="text" id="bind-0" maxlength="1" value="D" class="w-full text-center bg-slate-900 border border-slate-700 rounded py-1 font-mono uppercase text-sm">
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-500 block text-center mb-1">เลน 2</span>
+                                <input type="text" id="bind-1" maxlength="1" value="F" class="w-full text-center bg-slate-900 border border-slate-700 rounded py-1 font-mono uppercase text-sm">
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-500 block text-center mb-1">เลน 3</span>
+                                <input type="text" id="bind-2" maxlength="1" value="J" class="w-full text-center bg-slate-900 border border-slate-700 rounded py-1 font-mono uppercase text-sm">
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-500 block text-center mb-1">เลน 4</span>
+                                <input type="text" id="bind-3" maxlength="1" value="K" class="w-full text-center bg-slate-900 border border-slate-700 rounded py-1 font-mono uppercase text-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">ระดับความเร็วของตัวโน้ต</label>
+                        <select id="config-speed" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-sm text-white focus:outline-none focus:border-brandBlue">
+                            <option value="1">Speed x1</option>
+                            <option value="2">Speed x2</option>
+                            <option value="3" selected>Speed x3</option>
+                            <option value="4">Speed x4</option>
+                            <option value="5">Speed x5</option>
+                        </select>
+                    </div>
+
+                    <button id="btn-save-settings" class="w-full py-2 bg-gradient-to-r from-brandBlue to-indigo-600 text-slate-950 font-bold rounded-xl text-sm transition">
+                        บันทึกการตั้งค่า
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="print-area" class="hidden">
+            <div class="text-center space-y-6">
+                <div class="text-indigo-950 font-extrabold text-5xl tracking-widest uppercase">Certificate Of Achievement</div>
+                <div class="text-slate-600 italic text-lg">สถาบันเทคโนโลยีดนตรีสากลและการจับจังหวะ Rhythm World</div>
+                <div class="w-32 h-1 bg-indigo-950 mx-auto"></div>
+                <p class="text-xl">ขอมอบเกียรติบัตรฉบับนี้เพื่อแสดงความเคารพในความสามารถของ</p>
+                <div class="text-4xl font-extrabold text-indigo-900 underline underline-offset-8" id="cert-full-name">-</div>
+                <div class="text-lg text-slate-700">
+                    ชั้นเรียน: <span id="cert-grade" class="font-bold">-</span> | เลขที่: <span id="cert-no" class="font-bold">-</span>
+                </div>
+                <p class="max-w-md mx-auto text-slate-600 text-sm leading-relaxed">
+                    ได้แสดงให้เห็นถึงทักษะและความมุ่งมั่นในการเรียนรู้การจับจังหวะครบตามมาตรฐานหลักสูตรทักษะเชิงลึกเป็นผลสำเร็จ
+                </p>
+                <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto bg-slate-100 p-4 rounded-xl border border-dashed border-indigo-900/30">
+                    <div>
+                        <span class="text-xs text-slate-500 block">คะแนนสะสมรวมสุทธิ</span>
+                        <span id="cert-score" class="font-bold text-lg text-indigo-950">- PTS</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 block">วันที่สำเร็จการศึกษา</span>
+                        <span id="cert-date" class="font-bold text-sm text-indigo-950">-</span>
+                    </div>
+                </div>
+                <div class="pt-10 no-print space-x-2">
+                    <button onclick="window.print()" class="bg-indigo-900 hover:bg-indigo-950 text-white px-6 py-2.5 rounded-lg font-bold text-sm shadow">
+                        <i class="fa-solid fa-print"></i> พิมพ์เกียรติบัตร
+                    </button>
+                    <button id="btn-close-cert" class="bg-slate-300 hover:bg-slate-400 text-slate-800 px-6 py-2.5 rounded-lg font-bold text-sm shadow">
+                        ปิดหน้าต่างนี้
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // 1. GAME CONSTANTS & DATABASE STATE
+        let currentUser = null;
+        let usersDb = JSON.parse(localStorage.getItem('rw_users')) || {};
+        let scoresDb = JSON.parse(localStorage.getItem('rw_scores')) || [];
+        
+        let keyMapping = JSON.parse(localStorage.getItem('rw_keys')) || { 0: 'D', 1: 'F', 2: 'J', 3: 'K' };
+        let speedMultiplier = parseInt(localStorage.getItem('rw_speed')) || 3;
+
+        // Custom Sound synthesis framework
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let currentCustomAudio = null; // เก็บ Instance ลำโพงเพลง .mp3 คิวปัจจุบัน
+        let mp3Base64Storage = ""; // ตัวแปรพักข้อมูลไฟล์เพลงชั่วคราวขณะอัปโหลด
+
+        function playSynthTone(freq, duration, type = 'sine') {
+            // ไม่ส่งเสียง Synth รบกวนหากด่านนั้นเปิดเล่นผ่านไฟล์เพลง .mp3 อยู่
+            if (currentCustomAudio) return; 
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {}
+        }
+
+        const LEVEL_DATABASE = {
+            1: { id: 1, title: 'มาเริ่มต้นกันเถอะ! (สอนเล่น)', desc: 'สอนจับจังหวะสากล 4 จังหวะอย่างสม่ำเสมอ', bpm: 90, duration: 15, beats: [4, 8, 12, 16, 20, 24, 28, 32] },
+            2: { id: 2, title: 'มาเริ่มต้นกันเถอะ! (เล่นจริง)', desc: 'ฝึกทักษะการซิงโครไนซ์สมองกับตา', bpm: 110, duration: 25, beats: [4,6,8,10,12,14,16,18,20,22,24,26,28,30] },
+            3: { id: 3, title: 'ตีตัวตุ่นตามจังหวะเพลง!', desc: 'จังหวะแบบซิงโคเปชั่น เพิ่มความถี่และกระโดดข้ามเลน', bpm: 120, duration: 30, beats: [3,4,7,8,11,12,15,16,19,20,23,24,27,28,31,32,35,36] },
+            4: { id: 4, title: 'การเปลี่ยน BPM ของเพลง', desc: 'จังหวะจะเร็วขึ้นเป็น 2 เท่ากลางคันเพื่อท้าทายสมาธิ', bpm: 140, duration: 35, beats: [2,4,6,8,10,12,14,16,20,22,24,26,30,32,34,36,40,42,44,46,48] },
+            5: { id: 5, title: 'Are you ready? ขั้นแอดวานซ์', desc: 'ทุกองค์ประกอบที่เรียนรู้ร่วมกัน สอบเลเวลปลายภาค', bpm: 150, duration: 40, beats: [2,4,5,7,9,11,12,14,16,18,19,21,23,25,26,28,30,32,33,35,37,39,41,43] }
+        };
+
+        let dynamicFreePlayList = JSON.parse(localStorage.getItem('rw_freeplay_charts')) || [
+            { id: 'free-1', title: 'Moonlight Sonata (Techno Remixed)', artist: 'Beethoven', bpm: 130, lvl: 15, difficulty: 'Normal', beats: [2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32], audioData: "" },
+            { id: 'free-2', title: 'ENDYMION', artist: 'Rhythm Master', bpm: 180, lvl: 25, difficulty: 'Hard', beats: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26], audioData: "" }
+        ];
+
+        function speakAssistant(text) {
+            document.getElementById('speech-text').innerText = text;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            updateChartEditor();
+            setupEventHandlers();
+        });
+
+        function initApp() {
+            const storedUser = localStorage.getItem('rw_current_user');
+            if (storedUser && usersDb[storedUser]) {
+                currentUser = usersDb[storedUser];
+                showLobby();
+            } else {
+                showScreen('screen-auth');
+            }
+            updateTeacherData();
+        }
+
+        function showScreen(screenId) {
+            ['screen-auth', 'screen-lobby', 'screen-game', 'screen-result', 'screen-teacher', 'print-area'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        function showLobby() {
+            showScreen('screen-lobby');
+            document.getElementById('nav-user-info').classList.remove('hidden');
+            document.getElementById('nav-username').innerText = currentUser.username;
+            document.getElementById('nav-class-no').innerText = `ห้อง ${currentUser.grade} เลขที่ ${currentUser.no}`;
+            document.getElementById('lobby-player-name').innerText = currentUser.username;
+            renderLessonMap();
+            renderFreePlayList();
+            updateLobbyStats();
+        }
+
+        function updateLobbyStats() {
+            const scores = scoresDb.filter(s => s.username === currentUser.username);
+            const totalScore = scores.reduce((sum, current) => sum + current.score, 0);
+            document.getElementById('lobby-total-score').innerText = `${totalScore} PTS`;
+            const campaignLevelsCleared = [...new Set(scores.filter(s => typeof s.stageId === 'number').map(s => s.stageId))];
+            document.getElementById('lobby-progress').innerText = `${campaignLevelsCleared.length} / 5`;
+            const passedLv5 = scores.some(s => s.stageId === 5 && s.score >= 1000);
+            if (passedLv5) document.getElementById('cert-unlocked-banner').classList.remove('hidden');
+            else document.getElementById('cert-unlocked-banner').classList.add('hidden');
+        }
+
+        function setupEventHandlers() {
+            const tabLogin = document.getElementById('tab-login');
+            const tabRegister = document.getElementById('tab-register');
+            const formLogin = document.getElementById('form-login');
+            const formRegister = document.getElementById('form-register');
+
+            tabLogin.addEventListener('click', () => {
+                tabLogin.className = "flex-1 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white transition duration-200";
+                tabRegister.className = "flex-1 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white transition duration-200";
+                formLogin.classList.remove('hidden');
+                formRegister.classList.add('hidden');
+            });
+
+            tabRegister.addEventListener('click', () => {
+                tabRegister.className = "flex-1 py-2 text-sm font-semibold rounded-lg bg-indigo-600 text-white transition duration-200";
+                tabLogin.className = "flex-1 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white transition duration-200";
+                formRegister.classList.remove('hidden');
+                formLogin.classList.add('hidden');
+            });
+
+            formLogin.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const u = document.getElementById('login-username').value.trim();
+                const p = document.getElementById('login-password').value;
+                if (usersDb[u] && usersDb[u].password === p) {
+                    currentUser = usersDb[u];
+                    localStorage.setItem('rw_current_user', u);
+                    showLobby();
+                } else {
+                    alert('ข้อมูลผิดพลาด!');
+                }
+            });
+
+            formRegister.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const u = document.getElementById('reg-username').value.trim();
+                const p = document.getElementById('reg-password').value;
+                const g = document.getElementById('reg-grade').value;
+                const n = document.getElementById('reg-no').value;
+                if (usersDb[u]) { alert('มีชื่อผู้ใช้นี้แล้ว'); return; }
+                usersDb[u] = { username: u, password: p, grade: g, no: n };
+                localStorage.setItem('rw_users', JSON.stringify(usersDb));
+                currentUser = usersDb[u];
+                localStorage.setItem('rw_current_user', u);
+                showLobby();
+            });
+
+            document.getElementById('btn-settings').addEventListener('click', () => {
+                document.getElementById('panel-settings').classList.remove('hidden');
+            });
+            document.getElementById('btn-close-settings').addEventListener('click', () => {
+                document.getElementById('panel-settings').classList.add('hidden');
+            });
+            document.getElementById('btn-save-settings').addEventListener('click', () => {
+                speedMultiplier = parseInt(document.getElementById('config-speed').value);
+                localStorage.setItem('rw_speed', speedMultiplier);
+                document.getElementById('panel-settings').classList.add('hidden');
+            });
+
+            document.getElementById('btn-teacher-portal').addEventListener('click', () => {
+                const pin = prompt('กรุณากรอกรหัสผ่าน (2026):', '');
+                if (pin === '2026') { showScreen('screen-teacher'); updateTeacherData(); }
+            });
+            document.getElementById('btn-exit-teacher').addEventListener('click', () => { showLobby(); });
+
+            document.getElementById('btn-result-lobby').addEventListener('click', () => { showLobby(); });
+            document.getElementById('btn-result-retry').addEventListener('click', () => { startRhythmEngine(activeStageConfig, activeIsCampaign); });
+            document.getElementById('btn-close-cert').addEventListener('click', () => { showLobby(); });
+
+            document.getElementById('lobby-tab-map').addEventListener('click', () => {
+                document.getElementById('lobby-lesson-map').classList.remove('hidden');
+                document.getElementById('lobby-free-play').classList.add('hidden');
+            });
+            document.getElementById('lobby-tab-free').addEventListener('click', () => {
+                document.getElementById('lobby-free-play').classList.remove('hidden');
+                document.getElementById('lobby-lesson-map').classList.add('hidden');
+            });
+        }
+
+        function renderLessonMap() {
+            const grid = document.getElementById('map-levels-grid');
+            grid.innerHTML = '';
+            Object.values(LEVEL_DATABASE).forEach(lvl => {
+                const card = document.createElement('div');
+                card.className = "glass rounded-xl p-5 border border-brandBlue/20 flex flex-col justify-between";
+                card.innerHTML = `<h3 class="font-bold text-sm text-white">${lvl.title}</h3><button class="bg-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg mt-4 btn-start-lvl">เริ่ม</button>`;
+                card.querySelector('.btn-start-lvl').addEventListener('click', () => { startRhythmEngine(lvl, true); });
+                grid.appendChild(card);
+            });
+        }
+
+        function renderFreePlayList() {
+            const grid = document.getElementById('freeplay-list-grid');
+            grid.innerHTML = '';
+            dynamicFreePlayList.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "glass rounded-xl p-4 flex justify-between items-center border border-white/10";
+                card.innerHTML = `<div><span class="text-[10px] bg-indigo-950 text-brandPink px-2 py-0.5 rounded-full font-bold">${item.difficulty}</span><h4 class="font-bold text-sm text-white">${item.title}</h4></div><button class="bg-brandPink text-slate-950 font-bold text-xs px-4 py-2 rounded-xl btn-play-free">เล่น</button>`;
+                card.querySelector('.btn-play-free').addEventListener('click', () => { startRhythmEngine(item, false); });
+                grid.appendChild(card);
+            });
+        }
+
+        // 6. RHYTHM ENGINE (รองรับการเปิดเพลงประกอบ .mp3)
+        let activeStageConfig = null;
+        let activeIsCampaign = true;
+        let gameLoopId = null;
+        let gameScore = 0;
+        let gameCombo = 0;
+        let gameNotes = [];
+        let hitPerfect = 0, hitGood = 0, hitBad = 0, hitMiss = 0;
+        let activeAudioInterval = null;
+
+        function startRhythmEngine(stageConfig, isCampaign) {
+            activeStageConfig = stageConfig;
+            activeIsCampaign = isCampaign;
+            gameScore = 0; gameCombo = 0;
+            hitPerfect = 0; hitGood = 0; hitBad = 0; hitMiss = 0; gameNotes = [];
+            
+            // ล้างเสียงเพลงเก่าที่ค้างอยู่ก่อนหน้าออกทั้งหมด
+            if (currentCustomAudio) { currentCustomAudio.pause(); currentCustomAudio = null; }
+
+            showScreen('screen-game');
+            document.getElementById('game-stage-title').innerText = stageConfig.title;
+            document.getElementById('live-score').innerText = '0';
+            document.getElementById('live-combo').innerText = '0';
+
+            const notesContainer = document.getElementById('notes-container');
+            Array.from(notesContainer.children).forEach(c => { if (c.id !== 'judgment-float') c.remove(); });
+
+            // ตรวจสอบว่าด่านมีไฟล์เพลง .mp3 ประกอบอยู่หรือไม่
+            if (stageConfig.audioData && stageConfig.audioData !== "") {
+                currentCustomAudio = new Audio(stageConfig.audioData);
+                currentCustomAudio.play().catch(e => console.log("Audio presentation gesture error handled."));
+                speakAssistant(`กำลังเล่นฟิลด์เสียงเพลงอัปโหลดจริง ความเร็วตัวโน้ตคูณ ${speedMultiplier}`);
+            } else {
+                speakAssistant("เล่นเสียงสังเคราะห์แจ้งจังหวะพื้นฐาน");
+            }
+
+            const bpm = stageConfig.bpm;
+            const beatIntervalMs = (60 / bpm) * 1000;
+            const totalDurationSec = stageConfig.duration || 30;
+            
+            stageConfig.beats.forEach((beat, index) => {
+                const lane = Math.floor(Math.random() * 4);
+                // ตั้งค่าหน่วงเวลาโน้ต 1.5 วินาทีเพื่อให้เริ่มพอดีหน้าจอ
+                const targetTime = (beat * beatIntervalMs) + 1500;
+                gameNotes.push({ id: `note-${index}`, lane: lane, targetTime: targetTime, hit: false, domElement: null });
+            });
+
+            let synthTicks = 0;
+            const totalTicksNeeded = Math.ceil((totalDurationSec * 1000) / beatIntervalMs);
+
+            activeAudioInterval = setInterval(() => {
+                synthTicks++;
+                // สลับจังหวะส่งเสียงเคาะกลองเฉพาะด่านสไตล์ทดสอบที่ไม่มีไฟล์เพลงสด
+                if (!currentCustomAudio) {
+                    if (synthTicks % 4 === 0) playSynthTone(150, 0.15, 'triangle');
+                    else playSynthTone(600, 0.05, 'sine');
+                }
+                if (synthTicks >= totalTicksNeeded + 6) stopRhythmGame(true);
+            }, beatIntervalMs);
+
+            const startTimeStamp = performance.now();
+            
+            function updateGameFrame(timestamp) {
+                const elapsed = timestamp - startTimeStamp;
+                gameNotes.forEach(note => {
+                    if (!note.domElement && elapsed >= note.targetTime - 2000 && !note.hit) {
+                        const elem = document.createElement('div');
+                        elem.className = "absolute w-[80%] h-5 bg-gradient-to-r rounded shadow-lg";
+                        if (note.lane === 0) elem.classList.add('from-brandBlue', 'to-indigo-500');
+                        if (note.lane === 1) elem.classList.add('from-brandPink', 'to-rose-500');
+                        if (note.lane === 2) elem.classList.add('from-brandYellow', 'to-amber-500');
+                        if (note.lane === 3) elem.classList.add('from-brandMint', 'to-teal-500');
+                        elem.style.left = "10%"; elem.style.top = "-40px";
+                        notesContainer.appendChild(elem);
+                        note.domElement = elem;
+                    }
+
+                    if (note.domElement && !note.hit) {
+                        const remTime = note.targetTime - elapsed;
+                        const hitLineY = 450 - 96;
+                        const percentOfJourney = 1 - (remTime / (1500 / (speedMultiplier / 3)));
+                        note.domElement.style.top = `${percentOfJourney * hitLineY}px`;
+                        if (remTime < -200) { note.hit = true; note.domElement.remove(); triggerHitJudgment('MISS'); }
+                    }
+                });
+                gameLoopId = requestAnimationFrame(updateGameFrame);
+            }
+            gameLoopId = requestAnimationFrame(updateGameFrame);
+            setupGameplayInputs(startTimeStamp);
+        }
+
+        let gameplayKeydownRef = null;
+        function setupGameplayInputs(gameStartTime) {
+            if (gameplayKeydownRef) document.removeEventListener('keydown', gameplayKeydownRef);
+            gameplayKeydownRef = (e) => {
+                const key = e.key.toUpperCase();
+                for (let i = 0; i < 4; i++) {
+                    if (keyMapping[i] === key) { triggerLaneHit(i, performance.now() - gameStartTime); visualKeyPadHighlight(i); }
+                }
+            };
+            document.addEventListener('keydown', gameplayKeydownRef);
+
+            const padButtons = document.querySelectorAll('.key-pad');
+            padButtons.forEach(btn => {
+                const lane = parseInt(btn.getAttribute('data-lane'));
+                const cleanBtn = btn.cloneNode(true); btn.parentNode.replaceChild(cleanBtn, btn);
+                cleanBtn.addEventListener('pointerdown', (e) => {
+                    e.preventDefault(); triggerLaneHit(lane, performance.now() - gameStartTime); visualKeyPadHighlight(lane);
+                });
+            });
+
+            document.getElementById('btn-abort-game').onclick = () => { stopRhythmGame(false); };
+        }
+
+        function triggerLaneHit(lane, elapsed) {
+            const candidates = gameNotes.filter(n => n.lane === lane && !n.hit);
+            if (candidates.length === 0) return;
+            const note = candidates[0];
+            const accuracyDiff = Math.abs(note.targetTime - elapsed);
+
+            let judgment = '';
+            if (accuracyDiff <= 65) { judgment = 'PERFECT'; hitPerfect++; gameScore += 150; gameCombo++; }
+            else if (accuracyDiff <= 140) { judgment = 'GOOD'; hitGood++; gameScore += 100; gameCombo++; }
+            else if (accuracyDiff <= 240) { judgment = 'BAD'; hitBad++; gameScore += 40; gameCombo = 0; }
+            else if (accuracyDiff <= 340) { judgment = 'MISS'; hitMiss++; gameCombo = 0; }
+            else { return; }
+
+            note.hit = true;
+            if (note.domElement) note.domElement.remove();
+            triggerHitJudgment(judgment);
+            document.getElementById('live-score').innerText = gameScore;
+            document.getElementById('live-combo').innerText = gameCombo;
+        }
+
+        function triggerHitJudgment(judgment) {
+            const box = document.getElementById('judgment-float');
+            const txt = document.getElementById('judgment-text');
+            txt.innerText = judgment;
+            box.style.transform = 'translate(-50%, -50%) scale(1.3)'; box.style.opacity = '1';
+            setTimeout(() => { box.style.transform = 'translate(-50%, -50%) scale(1)'; box.style.opacity = '0'; }, 150);
+        }
+
+        function visualKeyPadHighlight(laneId) {
+            const pad = document.querySelector(`.key-pad[data-lane="${laneId}"]`);
+            if (pad) {
+                pad.classList.add('key-active');
+                setTimeout(() => pad.classList.remove('key-active'), 100);
+            }
+        }
+
+        function stopRhythmGame(isCompleted) {
+            if (gameLoopId) cancelAnimationFrame(gameLoopId);
+            if (activeAudioInterval) clearInterval(activeAudioInterval);
+            if (gameplayKeydownRef) document.removeEventListener('keydown', gameplayKeydownRef);
+            if (currentCustomAudio) { currentCustomAudio.pause(); currentCustomAudio = null; }
+
+            if (isCompleted) {
+                scoresDb.push({ username: currentUser.username, stageId: activeStageConfig.id, score: gameScore });
+                localStorage.setItem('rw_scores', JSON.stringify(scoresDb));
+                showScreen('screen-result');
+                document.getElementById('result-score').innerText = gameScore;
+                document.getElementById('result-perfect').innerText = hitPerfect;
+                document.getElementById('result-good').innerText = hitGood;
+                document.getElementById('result-bad').innerText = hitBad;
+                document.getElementById('result-miss').innerText = hitMiss;
+            } else {
+                showLobby();
+            }
+        }
+
+        function updateTeacherData() {
+            document.getElementById('dash-students-count').innerText = Object.keys(usersDb).length;
+            const directory = document.getElementById('student-list'); directory.innerHTML = 'พร้อมใช้งานเบื้องต้น';
+            buildTeacherChart();
+        }
+
+        let myClassChart = null;
+        function buildTeacherChart() {
+            const ctx = document.getElementById('scoresChart').getContext('2d');
+            if (myClassChart) myClassChart.destroy();
+            myClassChart = new Chart(ctx, { type: 'bar', data: { labels: ['ม.1','ม.2','ม.3'], datasets:[{label:'คะแนนรวม', data:[1200,850,0], backgroundColor:'#a5f3fc'}] }, options:{responsive:true, maintainAspectRatio:false}});
+        }
+
+        // 8. DYNAMIC CHART EDITOR (รองรับการแปลงไฟล์เพลง .mp3 เป็น Base64 String)
+        function updateChartEditor() {
+            const mp3FileInput = document.getElementById('edit-song-mp3-file');
+            
+            // ตรวจสอบการอัปโหลดและจับไฟล์เสียง .mp3 แปลงสถานะ
+            mp3FileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    // เก็บข้อมูลไฟล์เพลงในรูปแบบ Base64 ลงตัวแปร เพื่อนำไปเซฟคู่กับ Chart
+                    mp3Base64Storage = event.target.result;
+                    console.log("ขอดึงและจดจำโครงสร้างไฟล์เพลงสำเร็จ!");
+                };
+                reader.readAsDataURL(file); // อ่านข้อมูลแบบ DataURL สำหรับใช้รัน Audio สด
+            });
+
+            // ตรวจสอบไฟล์ดึงโน้ตจากสากล .osu
+            const osuFileInput = document.getElementById('edit-song-osu-file');
+            osuFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(event) { parseOsuManiaFile(event.target.result); };
+                reader.readAsText(file);
+            });
+
+            document.getElementById('btn-save-chart').addEventListener('click', () => {
+                const title = document.getElementById('edit-song-title').value.trim();
+                const artist = document.getElementById('edit-song-artist').value.trim();
+                const bpm = parseInt(document.getElementById('edit-song-bpm').value) || 120;
+                const level = parseInt(document.getElementById('edit-song-lvl').value) || 10;
+                const diffLabel = document.getElementById('edit-song-diff').value;
+
+                if (!title) { alert('กรุณาระบุชื่อเพลงประกอบการสอน!'); return; }
+
+                let finalBeats = tempParsedOsuBeats;
+                if (finalBeats.length === 0) {
+                    // หากไม่ได้นำเข้าไฟล์โน้ต .osu จะทำการสุ่มจำลองบีตจังหวะความยาว 30 วินาทีให้
+                    for (let i = 2; i <= 36; i += 2) finalBeats.push(i);
+                }
+
+                const newChart = {
+                    id: `free-${Date.now()}`,
+                    title: title,
+                    artist: artist,
+                    bpm: bpm,
+                    lvl: level,
+                    difficulty: diffLabel,
+                    beats: finalBeats,
+                    audioData: mp3Base64Storage // ทำการผูกข้อมูลเสียง .mp3 ฝังเข้าตัวแปรด่าน
+                };
+
+                dynamicFreePlayList.push(newChart);
+                localStorage.setItem('rw_freeplay_charts', JSON.stringify(dynamicFreePlayList));
+                
+                alert(`บันทึกชาร์ตเพลงและโอนถ่ายไฟล์เสียง "${title}" เรียบร้อยแล้ว!`);
+                
+                // รีเซ็ตตัวแปรเก็บไฟล์เสียงชั่วคราวหลังทำรายการเสร็จสิ้น
+                mp3Base64Storage = "";
+                tempParsedOsuBeats = [];
+                document.getElementById('edit-song-mp3-file').value = "";
+                document.getElementById('edit-song-osu-file').value = "";
+                
+                renderFreePlayList();
+                showLobby();
+            });
+        }
+
+        let tempParsedOsuBeats = [];
+        function parseOsuManiaFile(content) {
+            try {
+                const lines = content.split('\n');
+                let hitObjectsSection = false; const accumulatedTimes = [];
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (line.startsWith('Title:')) document.getElementById('edit-song-title').value = line.replace('Title:', '').trim();
+                    if (line.startsWith('[HitObjects]')) { hitObjectsSection = true; continue; }
+                    if (hitObjectsSection) {
+                        const parts = line.split(',');
+                        if (parts.length >= 3) accumulatedTimes.push(parseInt(parts[2]));
+                    }
+                }
+                if (accumulatedTimes.length > 0) {
+                    const estBpm = parseInt(document.getElementById('edit-song-bpm').value) || 120;
+                    const beatIntervalMs = (60 / estBpm) * 1000;
+                    tempParsedOsuBeats = accumulatedTimes.map(ms => Math.round(ms / beatIntervalMs)).filter(b => b > 0);
+                    tempParsedOsuBeats = [...new Set(tempParsedOsuBeats)].sort((a,b) => a-b);
+                    alert(`สกัดโน้ตจังหวะจากไฟล์สำเร็จ! ${accumulatedTimes.length} จุด`);
+                }
+            } catch (err) { alert('ข้อผิดพลาดการแปลงไฟล์'); }
+        }
+    </script>
+</body>
+</html>
